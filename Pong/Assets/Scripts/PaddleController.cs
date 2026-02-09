@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PaddleController : MonoBehaviour
+public abstract class PaddleController : MonoBehaviour
 {
     protected float speed = 5f;
     protected Rigidbody2D rb;
@@ -18,8 +18,5 @@ public class PaddleController : MonoBehaviour
         rb.linearVelocity = new Vector2(0, input * speed);
     }
 
-    protected virtual float GetMovementInput()
-    {
-        return 0f;
-    }
+    protected abstract float GetMovementInput();
 }
