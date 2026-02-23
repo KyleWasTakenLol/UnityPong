@@ -1,71 +1,91 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class BallMovement : MonoBehaviour, ICollidable
+public class BallMovement : NetworkBehaviour, ICollidable
 {
+    [SerializeField] private float speed = 5f;
 
-//Private Fields
-private float speed = 3f;
-private Vector2 direction;
-private Rigidbody2D ball;
+    private Vector2 direction;
+    private Rigidbody2D rb;
 
-//Public Get-Set Properties
-public float Speed
+    public float Speed
     {
         get { return speed; }
-        set { speed = value; }
+        set { speed = (value < 0) ? 0 : value; }
     }
 
-
-public Vector2 Direction
+    public Vector2 Direction
     {
         get { return direction; }
-        set { direction =value.normalized; }
+        set { direction = value.normalized; }
     }
 
-//Start function
-void Start()
-{
-    //Create ball object and set starting velocity
-    ball = GetComponent<Rigidbody2D>();
-    direction = new Vector2(1, 1);
-    ball.linearVelocity = direction * speed;
-}
-
-//Collision Logic
-void OnCollisionEnter2D(Collision2D collision)
+    void Awake()
     {
-        OnHit(collision);
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsServer) return;
+
+        Speed = 0f;
+        Direction = Vector2.right;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+    }
+
+    void FixedUpdate()
+    {
+        if (!IsServer) return;
+        rb.velocity = Direction * Speed;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!IsServer) return;
+
         ICollidable collidable = collision.gameObject.GetComponent<ICollidable>();
         if (collidable != null)
         {
             collidable.OnHit(collision);
         }
+
+        OnHit(collision);
     }
 
-public void OnHit(Collision2D collision)
-{ 
-  // Reverse horizontal direction for top and bottom walls
-  if (collision.gameObject.name == "Top Wall" || collision.gameObject.name == "Bottom Wall")
-        {
-            direction.y = -direction.y;
-        }
-    //Reverse vertical direction for left and right walls
-    else if (collision.gameObject.name == "Left Wall" || collision.gameObject.name == "Right Wall")
-        {
-            direction.x = -direction.x;
-        }
-    //Reverse vertical direction for paddle collisions
-    else if (collision.gameObject.name == "Left Paddle" || collision.gameObject.name == "Right Paddle")
-        {
-            direction.x = -direction.x;
-            speed += 1; //Add little speed boost to the ball when it its a paddle
-        }
-  //Debug.Log("Hit: " + collision.gameObject.name); //Sanity check for debugging bounce issue
-}
-
-//Update function to continuously update ball velocity
-void FixedUpdate()
+    public void OnHit(Collision2D collision)
     {
-        ball.linearVelocity = direction * speed;
+        if (collision.gameObject.CompareTag("Paddle"))
+        {
+            Direction = new Vector2(-Direction.x, Direction.y);
+        }
+        else if (collision.gameObject.CompareTag("wall"))
+        {
+            Direction = new Vector2(Direction.x, -Direction.y);
+        }
+    }
+
+    public void ResetToCenterAndServe(Vector2 serveDir, float serveSpeed)
+    {
+        if (!IsServer) return;
+
+        rb.position = Vector2.zero;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+
+        Direction = serveDir;
+        Speed = serveSpeed;
+
+        rb.velocity = Direction * Speed;
+    }
+
+    public void StopBall()
+    {
+        if (!IsServer) return;
+
+        Speed = 0f;
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
 }

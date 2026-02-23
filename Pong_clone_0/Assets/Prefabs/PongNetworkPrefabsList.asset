@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkPrefabsList
   IsDefault: 0
   List:
-  - Override: 0
+  - Override: 1
     Prefab: {fileID: 1465539424361317187, guid: 2e5cfacf7f19ae244a1ca4b044b484a2, type: 3}
-    SourcePrefabToOverride: {fileID: 0}
+    SourcePrefabToOverride: {fileID: 1465539424361317187, guid: 2e5cfacf7f19ae244a1ca4b044b484a2, type: 3}
     SourceHashToOverride: 0
-    OverridingTargetPrefab: {fileID: 0}
-  - Override: 0
+    OverridingTargetPrefab: {fileID: 1465539424361317187, guid: 2e5cfacf7f19ae244a1ca4b044b484a2, type: 3}
+  - Override: 1
     Prefab: {fileID: 4709166948728650786, guid: ebfd64424efe89c4c8aea856164120e8, type: 3}
-    SourcePrefabToOverride: {fileID: 0}
+    SourcePrefabToOverride: {fileID: 4709166948728650786, guid: ebfd64424efe89c4c8aea856164120e8, type: 3}
     SourceHashToOverride: 0
-    OverridingTargetPrefab: {fileID: 0}
+    OverridingTargetPrefab: {fileID: 4709166948728650786, guid: ebfd64424efe89c4c8aea856164120e8, type: 3}
